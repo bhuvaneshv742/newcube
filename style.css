@@ -1,0 +1,667 @@
+/* ============================================================
+   CUBE4 — 4×4 Rubik's Cube Game
+   Style Sheet
+   ============================================================ */
+
+/* ── Reset & Base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Palette */
+  --bg:          #0a0a0f;
+  --surface:     #111118;
+  --surface2:    #1a1a25;
+  --border:      #2a2a3a;
+  --border-glow: #00d4ff40;
+
+  --cyan:        #00d4ff;
+  --cyan-dim:    #00d4ff55;
+  --amber:       #ffb347;
+  --purple:      #a855f7;
+  --green:       #22c55e;
+  --red:         #ef4444;
+
+  --text-primary:   #f0f0f8;
+  --text-secondary: #8888aa;
+  --text-dim:       #44445a;
+
+  /* Cube face colours */
+  --face-white:  #f0f0f0;
+  --face-yellow: #ffd700;
+  --face-red:    #e62020;
+  --face-orange: #ff6a00;
+  --face-blue:   #1e6fff;
+  --face-green:  #00b050;
+  --face-inner:  #111118;
+
+  /* Typography */
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Dimensions */
+  --cubie-size: 38px;
+  --cubie-gap:  2px;
+  --border-r:   8px;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* ── Dot-matrix background ────────────────────────────────── */
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, #ffffff08 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px 24px;
+  background: #0a0a0fdd;
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.1em;
+}
+.logo-icon { font-size: 20px; }
+.logo-accent { color: var(--cyan); }
+
+.header-stats {
+  display: flex;
+  gap: 12px;
+}
+
+.stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+.stat-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--text-secondary);
+}
+.stat-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--amber);
+}
+.mono { font-family: var(--font-mono); }
+
+/* ── Main Layout ──────────────────────────────────────────── */
+.main-layout {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 0;
+  min-height: calc(100vh - 57px);
+}
+
+/* ── Cube Viewport ────────────────────────────────────────── */
+.cube-viewport {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px 20px;
+  gap: 18px;
+}
+
+.scene {
+  width: min(420px, 90vw);
+  height: min(420px, 90vw);
+  perspective: 900px;
+  perspective-origin: 50% 45%;
+  cursor: grab;
+  user-select: none;
+  flex-shrink: 0;
+}
+.scene:active { cursor: grabbing; }
+
+.cube-container {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: rotateX(-30deg) rotateY(45deg);
+  transition: transform 0.05s linear;
+  position: relative;
+}
+
+/* ── Individual Cubie ─────────────────────────────────────── */
+.cubie {
+  position: absolute;
+  width: var(--cubie-size);
+  height: var(--cubie-size);
+  transform-style: preserve-3d;
+  /* position is set via JS translate3d */
+}
+
+.cubie-face {
+  position: absolute;
+  width: var(--cubie-size);
+  height: var(--cubie-size);
+  border: 1.5px solid #00000066;
+  border-radius: 3px;
+  backface-visibility: hidden;
+  transition: background-color 0.15s ease;
+}
+
+/* Six face directions */
+.face-front  { transform: translateZ(calc(var(--cubie-size) / 2)); }
+.face-back   { transform: rotateY(180deg) translateZ(calc(var(--cubie-size) / 2)); }
+.face-left   { transform: rotateY(-90deg) translateZ(calc(var(--cubie-size) / 2)); }
+.face-right  { transform: rotateY( 90deg) translateZ(calc(var(--cubie-size) / 2)); }
+.face-top    { transform: rotateX( 90deg) translateZ(calc(var(--cubie-size) / 2)); }
+.face-bottom { transform: rotateX(-90deg) translateZ(calc(var(--cubie-size) / 2)); }
+
+/* Face colour classes */
+.color-white  { background: var(--face-white);  box-shadow: inset 0 0 0 2px #ddd; }
+.color-yellow { background: var(--face-yellow); box-shadow: inset 0 0 0 2px #ccaa00; }
+.color-red    { background: var(--face-red);    box-shadow: inset 0 0 0 2px #aa0000; }
+.color-orange { background: var(--face-orange); box-shadow: inset 0 0 0 2px #cc4400; }
+.color-blue   { background: var(--face-blue);   box-shadow: inset 0 0 0 2px #0033bb; }
+.color-green  { background: var(--face-green);  box-shadow: inset 0 0 0 2px #007733; }
+.color-inner  { background: var(--face-inner); }
+
+.drag-hint {
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+
+/* ── Controls Panel ───────────────────────────────────────── */
+.controls-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-left: 1px solid var(--border);
+  background: var(--surface);
+  overflow-y: auto;
+}
+
+.control-group {
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.group-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.btn-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--border-r);
+  background: var(--surface2);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+
+.btn-icon { font-size: 14px; }
+
+.btn-primary {
+  background: var(--cyan);
+  border-color: var(--cyan);
+  color: #000;
+}
+.btn-primary:hover {
+  background: #33ddff;
+  border-color: #33ddff;
+  box-shadow: 0 0 20px var(--cyan-dim);
+}
+
+.btn-secondary {
+  border-color: var(--border);
+}
+.btn-secondary:hover {
+  border-color: var(--text-secondary);
+  background: var(--surface2);
+}
+
+.btn-accent {
+  border-color: var(--purple);
+  color: var(--purple);
+}
+.btn-accent:hover {
+  background: #a855f715;
+  box-shadow: 0 0 16px #a855f740;
+}
+
+.btn-timer {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+.btn-timer:hover {
+  background: #ffb34715;
+  box-shadow: 0 0 16px #ffb34740;
+}
+.btn-timer.active {
+  background: #ffb34725;
+}
+
+/* ── Axis Tabs ────────────────────────────────────────────── */
+.axis-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--border-r);
+  padding: 3px;
+}
+
+.axis-tab {
+  flex: 1;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.axis-tab.active {
+  background: var(--cyan);
+  color: #000;
+}
+.axis-tab:not(.active):hover {
+  background: var(--border);
+  color: var(--text-primary);
+}
+
+/* ── Layer Controls ───────────────────────────────────────── */
+.layer-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.layer-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.layer-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  width: 52px;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+}
+
+.layer-btn {
+  flex: 1;
+  padding: 7px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface2);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s;
+  font-family: var(--font-ui);
+}
+.layer-btn:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  background: var(--cyan-dim);
+}
+.layer-btn:active {
+  transform: scale(0.96);
+}
+.layer-btn.selected-layer {
+  border-color: var(--cyan);
+  background: var(--cyan-dim);
+  color: var(--cyan);
+}
+
+/* ── Keyboard Reference ───────────────────────────────────── */
+.key-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.key-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  padding: 2px 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-primary);
+}
+
+/* ── Win Modal ────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: #00000090;
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fade-in 0.25s ease;
+}
+.modal-overlay[hidden] { display: none; }
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px 36px 32px;
+  max-width: 380px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 30px 80px #00000088, 0 0 40px var(--cyan-dim);
+  animation: modal-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modal-pop {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.modal-confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  animation: confetti-fall linear forwards;
+}
+
+@keyframes confetti-fall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(420px) rotate(720deg); opacity: 0; }
+}
+
+.modal-icon {
+  font-size: 52px;
+  margin-bottom: 12px;
+  line-height: 1;
+}
+
+.modal-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--cyan);
+  margin-bottom: 6px;
+}
+
+.modal-subtitle {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.modal-stats {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-bottom: 28px;
+  padding: 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--border-r);
+}
+
+.modal-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.modal-stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+.modal-stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--amber);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.modal-actions .btn { min-width: 120px; }
+
+/* ── Rotating layer animation ─────────────────────────────── */
+.cubie.animating {
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+
+/* ---- Tablet / large phone (≤ 780px) ---- */
+@media (max-width: 780px) {
+  /* Stack layout vertically */
+  .main-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    min-height: unset;
+  }
+
+  /* Header: shrink stats pills so they don't overflow */
+  .header {
+    padding: 10px 14px;
+    gap: 8px;
+  }
+  .header-stats { gap: 8px; }
+  .stat-pill { padding: 5px 10px; gap: 6px; }
+  .stat-label { font-size: 9px; }
+  .stat-value { font-size: 13px; }
+
+  /* Cube viewport: tighter padding, centered */
+  .cube-viewport {
+    padding: 28px 16px 14px;
+    gap: 12px;
+  }
+
+  /* Scene shrinks to fit, stays centered */
+  .scene {
+    width: min(85vw, 320px);
+    height: min(85vw, 320px);
+    perspective: 700px;
+  }
+
+  :root { --cubie-size: 26px; }
+
+  /* Controls panel: two-column card grid below the cube */
+  .controls-panel {
+    border-left: none;
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: auto;
+    gap: 0;
+  }
+
+  /* Each group fills its grid cell */
+  .control-group {
+    flex: unset;
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+  /* Remove right border on second column */
+  .control-group:nth-child(2n) { border-right: none; }
+
+  /* Action buttons: 2-col grid is fine on tablet */
+  .btn-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Layer rows: tighten label width */
+  .layer-label { width: 42px; font-size: 10px; }
+  .layer-btn { font-size: 11px; padding: 6px 4px; }
+}
+
+/* ---- Small phone (≤ 480px) ---- */
+@media (max-width: 480px) {
+  /* Header: hide logo text, keep logo icon + stats */
+  .header { padding: 8px 12px; }
+  .header-logo .logo-text { display: none; }
+  .stat-pill { padding: 4px 8px; }
+
+  /* Scene: use almost full viewport width */
+  .scene {
+    width: min(88vw, 280px);
+    height: min(88vw, 280px);
+    perspective: 600px;
+  }
+  :root { --cubie-size: 20px; }
+
+  /* Controls panel: single-column stack */
+  .controls-panel {
+    grid-template-columns: 1fr;
+  }
+  .control-group { border-right: none !important; }
+
+  /* Action buttons: 2 per row */
+  .btn-grid { grid-template-columns: 1fr 1fr; }
+  .btn { font-size: 12px; padding: 9px 8px; gap: 4px; }
+  .btn-icon { font-size: 13px; }
+
+  /* Axis tabs: smaller text */
+  .axis-tab { font-size: 11px; padding: 5px 4px; }
+
+  /* Layer controls: compact */
+  .layer-label { width: 36px; font-size: 9px; }
+  .layer-btn { font-size: 10px; padding: 5px 3px; }
+
+  /* Keyboard reference: 2-col compact grid */
+  .key-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+  }
+
+  /* Modal: full-width on tiny screens */
+  .modal { padding: 28px 20px 24px; }
+  .modal-title { font-size: 22px; }
+  .modal-actions { flex-direction: column; }
+  .modal-actions .btn { min-width: unset; width: 100%; }
+}
+
+/* ---- Very small (≤ 360px) ---- */
+@media (max-width: 360px) {
+  .scene {
+    width: 90vw;
+    height: 90vw;
+    perspective: 500px;
+  }
+  :root { --cubie-size: 18px; }
+
+  .btn-grid { grid-template-columns: 1fr; }
+  .stat-pill:last-child { display: none; } /* hide timer pill, it shows in controls */
+}
+
+/* ── Utility ──────────────────────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
